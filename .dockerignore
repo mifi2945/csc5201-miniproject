@@ -1,0 +1,15 @@
+# Version Control
+.git
+.gitignore
+
+# Python things
+.venv/
+.pytest_cache/
+**/__pycache__/
+
+# docker
+.dockerignore
+Dockerfile
+
+# cloud
+cloudbuild.yaml
