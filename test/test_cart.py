@@ -7,7 +7,6 @@ from src.api import app, Product
 import src
 
 
-
 @pytest.fixture(autouse=True)
 def client(monkeypatch):
     app.config['TESTING'] = True
