@@ -1,15 +1,19 @@
 from flask import Flask, request, jsonify
-from dataclasses import asdict, dataclass, fields
+from dataclasses import dataclass, fields
 import redis
 import json
 import os
+import signal
+import sys
 
 app = Flask(__name__)
 
-pool = redis.ConnectionPool(
+pool = redis.BlockingConnectionPool(
     host='10.223.94.187',
     port=6379,
-    decode_responses=True
+    decode_responses=True,
+    max_connections=2,
+    timeout=10
 )
 db = redis.Redis(connection_pool=pool)
 
@@ -47,6 +51,16 @@ def cart(user_id):
         return jsonify({"error": "Invalid operation"}), 400
 
 
+def disconnect_redis(signum, frame):
+    print("Received SIGTERM/SIGINT. Closing Redis connection pool...", flush=True)
+    pool.disconnect()
+    print("Redis pool closed successfully. Exiting process.", flush=True)
+    sys.exit(0)
+
+
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 8080)), debug=True)
+    signal.signal(signal.SIGTERM, disconnect_redis)
+    signal.signal(signal.SIGINT, disconnect_redis)
+
+    app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 8080)), debug=False)

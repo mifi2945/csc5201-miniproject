@@ -1,10 +1,9 @@
 import pytest
 import fakeredis
 from dataclasses import asdict
-import json
 
 from src.api import app, Product
-import src
+import src.api as api
 
 
 @pytest.fixture(autouse=True)
@@ -12,7 +11,7 @@ def client(monkeypatch):
     app.config['TESTING'] = True
     fake_db = fakeredis.FakeRedis(decode_responses=True)
 
-    monkeypatch.setattr(src.api, 'db', fake_db)
+    monkeypatch.setattr(api, 'db', fake_db)
 
     return app.test_client()
 
