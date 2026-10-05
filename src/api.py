@@ -8,12 +8,10 @@ import sys
 
 app = Flask(__name__)
 
-pool = redis.BlockingConnectionPool(
-    host='10.223.94.187',
-    port=6379,
+pool = redis.ConnectionPool(
+    host=os.environ.get('REDIS_HOST', '10.223.94.187'),
+    port=os.environ.get('REDIS_PORT', 6379),
     decode_responses=True,
-    max_connections=2,
-    timeout=10
 )
 db = redis.Redis(connection_pool=pool)
 
