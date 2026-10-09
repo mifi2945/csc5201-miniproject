@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 from dataclasses import dataclass, fields
 import redis
 import json
@@ -61,4 +62,8 @@ if __name__ == '__main__':
     signal.signal(signal.SIGTERM, disconnect_redis)
     signal.signal(signal.SIGINT, disconnect_redis)
 
+    CORS(app, origins=[
+        os.environ.get('CORS_LOCALHOST', 'http://localhost:5173'),
+        os.environ.get('CORS_URL', '')
+    ])
     app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 8080)), debug=False)
