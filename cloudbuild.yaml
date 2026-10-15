@@ -18,6 +18,25 @@ steps:
   args: ['build', '-t',
           'us-central1-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REGISTRY_REPO}/${_SERVICE}:${SHORT_SHA}', '.']
 
+# Push the image before deploying it
+- name: 'gcr.io/cloud-builders/docker'
+  args:
+  - push
+  - us-central1-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REGISTRY_REPO}/${_SERVICE}:${SHORT_SHA}
+
+# Deploy the new image to the existing Cloud Run service
+- name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+  entrypoint: gcloud
+  args:
+  - run
+  - deploy
+  - ${_SERVICE}
+  - --image=us-central1-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REGISTRY_REPO}/${_SERVICE}:${SHORT_SHA}
+  - --region=${_REGION}
+  - --service-account=log-writer-service-account@engaged-upgrade-508218-r4.iam.gserviceaccount.com
+  - --platform=managed
+  - --quiet
+
 # Tag latest
 # - name: 'gcr.io/cloud-builders/docker'
 #   args: ['tag', 'us-central1-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REGISTRY_REPO}/${_SERVICE}:${SHORT_SHA}',

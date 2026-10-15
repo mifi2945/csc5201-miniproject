@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+from google.cloud import logging
 from dataclasses import dataclass, fields
 import redis
 import json
